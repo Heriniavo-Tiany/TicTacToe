@@ -1,6 +1,6 @@
-package main;
+package main.main;
 
-import jeu.*;
+import main.tictactoe.*;
 
 public class Main {
     public static void main(String[] args) {

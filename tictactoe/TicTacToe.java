@@ -1,11 +1,11 @@
-package jeu;
+package main.tictactoe;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
-import affichage.*;
+import main.tictactoe.*;
 
 public class TicTacToe implements ActionListener {
     JLabel titre = new JLabel();

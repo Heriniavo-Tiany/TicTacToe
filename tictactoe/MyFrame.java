@@ -1,4 +1,4 @@
-package affichage;
+package main.tictactoe;
 
 import javax.swing.*;
 import java.awt.*;
