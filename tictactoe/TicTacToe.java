@@ -1,6 +1,10 @@
 package main.tictactoe;
 
 import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.util.Random;
 
@@ -23,6 +27,13 @@ public class TicTacToe {
     }
 
     private void initialize() {
+        // Set look and feel
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         mainFrame = new JFrame();
         mainFrame.setTitle("Tic Tac Toe");
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -39,11 +50,17 @@ public class TicTacToe {
 
         boardPanel = new JPanel();
         boardPanel.setLayout(new GridLayout(NUM_ROWS, NUM_COLS));
+        boardPanel.setBackground(Color.WHITE);
+        Border line = new LineBorder(Color.BLACK);
+        Border margin = new EmptyBorder(10, 10, 10, 10);
+        Border compound = new CompoundBorder(line, margin);
+        boardPanel.setBorder(compound);
         buttons = new JButton[BOARD_SIZE];
         for (int i = 0; i < BOARD_SIZE; i++) {
             buttons[i] = new JButton();
             buttons[i].setFont(new Font("SansSerif", Font.BOLD, 120));
             buttons[i].setFocusable(false);
+            buttons[i].setBackground(Color.WHITE);
             buttons[i].addActionListener(e -> {
                 int index = getButtonIndex(e.getSource());
                 if (isPlayer1Turn) {
@@ -88,15 +105,15 @@ public class TicTacToe {
             });
             boardPanel.add(buttons[i]);
         }
-        mainFrame.add(boardPanel);
+        mainFrame.add(boardPanel, BorderLayout.CENTER);
+        isPlayer1Turn = true;
 
         mainFrame.setVisible(true);
-        isPlayer1Turn = true;
     }
 
-    private int getButtonIndex(Object button) {
+    private int getButtonIndex(Object source) {
         for (int i = 0; i < BOARD_SIZE; i++) {
-            if (buttons[i] == button) {
+            if (buttons[i] == source) {
                 return i;
             }
         }
@@ -106,25 +123,29 @@ public class TicTacToe {
     private boolean checkForWin(String symbol) {
         // Check rows
         for (int i = 0; i < BOARD_SIZE; i += 3) {
-            if (buttons[i].getText().equals(symbol) && buttons[i + 1].getText().equals(symbol)
-                    && buttons[i + 2].getText().equals(symbol)) {
+            if (buttons[i].getText().equals(symbol) &&
+                    buttons[i + 1].getText().equals(symbol) &&
+                    buttons[i + 2].getText().equals(symbol)) {
                 return true;
             }
         }
         // Check columns
-        for (int i = 0; i < NUM_COLS; i++) {
-            if (buttons[i].getText().equals(symbol) && buttons[i + 3].getText().equals(symbol)
-                    && buttons[i + 6].getText().equals(symbol)) {
+        for (int i = 0; i < 3; i++) {
+            if (buttons[i].getText().equals(symbol) &&
+                    buttons[i + 3].getText().equals(symbol) &&
+                    buttons[i + 6].getText().equals(symbol)) {
                 return true;
             }
         }
         // Check diagonals
-        if (buttons[0].getText().equals(symbol) && buttons[4].getText().equals(symbol)
-                && buttons[8].getText().equals(symbol)) {
+        if (buttons[0].getText().equals(symbol) &&
+                buttons[4].getText().equals(symbol) &&
+                buttons[8].getText().equals(symbol)) {
             return true;
         }
-        if (buttons[2].getText().equals(symbol) && buttons[4].getText().equals(symbol)
-                && buttons[6].getText().equals(symbol)) {
+        if (buttons[2].getText().equals(symbol) &&
+                buttons[4].getText().equals(symbol) &&
+                buttons[6].getText().equals(symbol)) {
             return true;
         }
         return false;
@@ -143,5 +164,7 @@ public class TicTacToe {
         for (int i = 0; i < BOARD_SIZE; i++) {
             buttons[i].setText("");
         }
+        isPlayer1Turn = new Random().nextBoolean();
     }
+
 }
