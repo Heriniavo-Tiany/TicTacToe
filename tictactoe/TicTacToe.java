@@ -2,123 +2,146 @@ package main.tictactoe;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
+import java.util.Random;
 
-public class TicTacToe implements ActionListener {
-    JLabel title = new JLabel();
-    MyFrame frame = new MyFrame();
-    JPanel panelTitle = new JPanel();
-    JPanel panelButton = new JPanel();
-    JButton[] buttonArray = new JButton[9];
-    boolean player1Turn;
+public class TicTacToe {
+    private static final int BOARD_SIZE = 9;
+    private static final int NUM_ROWS = 3;
+    private static final int NUM_COLS = 3;
+    private static final String PLAYER_1_SYMBOL = "O";
+    private static final String PLAYER_2_SYMBOL = "X";
+
+    private boolean isPlayer1Turn;
+    private JFrame mainFrame;
+    private JPanel titlePanel;
+    private JLabel titleLabel;
+    private JPanel boardPanel;
+    private JButton[] buttons;
 
     public TicTacToe() {
-        title.setBackground(new Color(25, 25, 25));
-        title.setForeground(new Color(25, 255, 0));
-        title.setFont(new Font("Ink Free", Font.BOLD, 75));
-        title.setHorizontalAlignment(JLabel.CENTER);
-        title.setOpaque(true);
-
-        panelTitle.setLayout(new BorderLayout());
-        panelTitle.setBounds(0, 0, 800, 100);
-
-        panelTitle.add(title);
-        frame.add(panelTitle, BorderLayout.NORTH);
-
-        panelButton.setLayout(new GridLayout(3, 3));
-        panelButton.setBackground(new Color(2, 5, 25));
-        frame.add(panelButton);
-
-        for (int i = 0; i < 9; i++) {
-            buttonArray[i] = new JButton();
-            panelButton.add(buttonArray[i]);
-            buttonArray[i].setFont(new Font("SansSerif", Font.BOLD, 120));
-            buttonArray[i].setFocusable(false);
-            buttonArray[i].addActionListener(this);
-        }
-
-        firstRound();
+        initialize();
     }
 
-    public void firstRound() {
-        if (new Random().nextInt(2) == 0) {
-            this.player1Turn = true;
-            title.setText("joueur 1 : O");
-        } else {
-            this.player1Turn = false;
-            title.setText("joueur 2 : X");
-        }
-    }
+    private void initialize() {
+        mainFrame = new JFrame();
+        mainFrame.setTitle("Tic Tac Toe");
+        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        mainFrame.setSize(500, 500);
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        for (int i = 0; i < 9; i++) {
-            if (e.getSource() == buttonArray[i]) {
-                if (player1Turn) {
-                    if (buttonArray[i].getText().equals("")) {
-                        buttonArray[i].setForeground(new Color(162, 71, 71));
-                        buttonArray[i].setText("O");
-                        player1Turn = false;
-                        title.setText("joueur 2 : X");
-                        check();
+        titlePanel = new JPanel();
+        titlePanel.setBackground(Color.BLACK);
+        titleLabel = new JLabel();
+        titleLabel.setText("Tic Tac Toe");
+        titleLabel.setForeground(Color.GREEN);
+        titleLabel.setFont(new Font("Ink Free", Font.BOLD, 50));
+        titlePanel.add(titleLabel);
+        mainFrame.add(titlePanel, BorderLayout.NORTH);
+
+        boardPanel = new JPanel();
+        boardPanel.setLayout(new GridLayout(NUM_ROWS, NUM_COLS));
+        buttons = new JButton[BOARD_SIZE];
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            buttons[i] = new JButton();
+            buttons[i].setFont(new Font("SansSerif", Font.BOLD, 120));
+            buttons[i].setFocusable(false);
+            buttons[i].addActionListener(e -> {
+                int index = getButtonIndex(e.getSource());
+                if (isPlayer1Turn) {
+                    if (buttons[index].getText().equals("")) {
+                        buttons[index].setForeground(new Color(0, 128, 0));
+                        buttons[index].setText(PLAYER_1_SYMBOL);
+                        isPlayer1Turn = false;
+                        if (checkForWin(PLAYER_1_SYMBOL)) {
+                            JOptionPane.showMessageDialog(mainFrame,
+                                    "Player 1 wins!", "Game Over", JOptionPane.PLAIN_MESSAGE);
+                            resetBoard();
+                        } else if (checkForTie()) {
+                            JOptionPane.showMessageDialog(mainFrame,
+                                    "It's a tie!", "Game Over", JOptionPane.PLAIN_MESSAGE);
+                            resetBoard();
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(mainFrame,
+                                "This cell is already taken. Choose another one.",
+                                "Invalid Move", JOptionPane.WARNING_MESSAGE);
                     }
                 } else {
-                    if (buttonArray[i].getText().equals("")) {
-                        buttonArray[i].setForeground(new Color(45, 91, 131));
-                        buttonArray[i].setText("X");
-                        title.setText("joueur 1 : O");
-                        player1Turn = true;
-                        check();
+                    if (buttons[index].getText().equals("")) {
+                        buttons[index].setForeground(new Color(255, 0, 0));
+                        buttons[index].setText(PLAYER_2_SYMBOL);
+                        isPlayer1Turn = true;
+                        if (checkForWin(PLAYER_2_SYMBOL)) {
+                            JOptionPane.showMessageDialog(mainFrame,
+                                    "Player 2 wins!", "Game Over", JOptionPane.PLAIN_MESSAGE);
+                            resetBoard();
+                        } else if (checkForTie()) {
+                            JOptionPane.showMessageDialog(mainFrame,
+                                    "It's a tie!", "Game Over", JOptionPane.PLAIN_MESSAGE);
+                            resetBoard();
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(mainFrame,
+                                "This cell is already taken. Choose another one.",
+                                "Invalid Move", JOptionPane.WARNING_MESSAGE);
                     }
                 }
-            }
+            });
+            boardPanel.add(buttons[i]);
         }
+        mainFrame.add(boardPanel);
+
+        mainFrame.setVisible(true);
+        isPlayer1Turn = true;
     }
 
-    public void check() {
-        // verticalement
-        for (int i = 0; i < 2; i++) {
-            if (buttonArray[i].getText().equals(buttonArray[i + 3].getText())
-                    && buttonArray[i].getText().equals(buttonArray[i + 6].getText())
-                    && !buttonArray[i].getText().equals("")) {
-                win(i, i + 3, i + 6);
+    private int getButtonIndex(Object button) {
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            if (buttons[i] == button) {
+                return i;
             }
         }
-
-        // horizontalement
-        for (int i = 0; i <= 6; i += 3) {
-            if (buttonArray[i].getText().equals(buttonArray[i + 1].getText())
-                    && buttonArray[i].getText().equals(buttonArray[i + 2].getText())
-                    && !buttonArray[i].getText().equals("")) {
-                win(i, i + 1, i + 2);
-            }
-        }
-
-        // obliquement
-        if (buttonArray[0].getText().equals(buttonArray[4].getText())
-                && buttonArray[0].getText().equals(buttonArray[8].getText()) && !buttonArray[0].getText().equals("")) {
-            win(0, 4, 8);
-        }
-        if (buttonArray[2].getText().equals(buttonArray[4].getText())
-                && buttonArray[2].getText().equals(buttonArray[6].getText()) && !buttonArray[2].getText().equals("")) {
-            win(2, 4, 6);
-        }
+        return -1;
     }
 
-    public void win(int x, int y, int z) {
-        buttonArray[x].setBackground(new Color(125, 209, 121));
-        buttonArray[y].setBackground(new Color(125, 209, 121));
-        buttonArray[z].setBackground(new Color(125, 209, 121));
-
-        if (buttonArray[x].getText().equals("X")) {
-            title.setText("X gagne");
-        } else {
-            title.setText("O gagne");
+    private boolean checkForWin(String symbol) {
+        // Check rows
+        for (int i = 0; i < BOARD_SIZE; i += 3) {
+            if (buttons[i].getText().equals(symbol) && buttons[i + 1].getText().equals(symbol)
+                    && buttons[i + 2].getText().equals(symbol)) {
+                return true;
+            }
         }
-        for (JButton btn : buttonArray) {
-            btn.setEnabled(false);
+        // Check columns
+        for (int i = 0; i < NUM_COLS; i++) {
+            if (buttons[i].getText().equals(symbol) && buttons[i + 3].getText().equals(symbol)
+                    && buttons[i + 6].getText().equals(symbol)) {
+                return true;
+            }
         }
+        // Check diagonals
+        if (buttons[0].getText().equals(symbol) && buttons[4].getText().equals(symbol)
+                && buttons[8].getText().equals(symbol)) {
+            return true;
+        }
+        if (buttons[2].getText().equals(symbol) && buttons[4].getText().equals(symbol)
+                && buttons[6].getText().equals(symbol)) {
+            return true;
+        }
+        return false;
+    }
 
+    private boolean checkForTie() {
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            if (buttons[i].getText().equals("")) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void resetBoard() {
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            buttons[i].setText("");
+        }
     }
 }
