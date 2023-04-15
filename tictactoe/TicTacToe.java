@@ -5,77 +5,70 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
-import main.tictactoe.*;
-
 public class TicTacToe implements ActionListener {
-    JLabel titre = new JLabel();
+    JLabel title = new JLabel();
     MyFrame frame = new MyFrame();
-    JPanel panelTitre = new JPanel();
-    JPanel panelBoutton = new JPanel();
-    JButton[] tabBouttons = new JButton[9];
-    boolean joueur1;
+    JPanel panelTitle = new JPanel();
+    JPanel panelButton = new JPanel();
+    JButton[] buttonArray = new JButton[9];
+    boolean player1Turn;
 
     public TicTacToe() {
-        titre.setBackground(new Color(25, 25, 25));
-        titre.setForeground(new Color(25, 255, 0));
-        titre.setFont(new Font("Ink Free", Font.BOLD, 75));
-        titre.setHorizontalAlignment(JLabel.CENTER);
-        titre.setOpaque(true);
+        title.setBackground(new Color(25, 25, 25));
+        title.setForeground(new Color(25, 255, 0));
+        title.setFont(new Font("Ink Free", Font.BOLD, 75));
+        title.setHorizontalAlignment(JLabel.CENTER);
+        title.setOpaque(true);
 
-        panelTitre.setLayout(new BorderLayout());
-        panelTitre.setBounds(0, 0, 800, 100);
+        panelTitle.setLayout(new BorderLayout());
+        panelTitle.setBounds(0, 0, 800, 100);
 
-        panelTitre.add(titre);
-        frame.add(panelTitre, BorderLayout.NORTH);
+        panelTitle.add(title);
+        frame.add(panelTitle, BorderLayout.NORTH);
 
-        panelBoutton.setLayout(new GridLayout(3, 3));
-        panelBoutton.setBackground(new Color(2, 5, 25));
-        frame.add(panelBoutton);
+        panelButton.setLayout(new GridLayout(3, 3));
+        panelButton.setBackground(new Color(2, 5, 25));
+        frame.add(panelButton);
 
         for (int i = 0; i < 9; i++) {
-            tabBouttons[i] = new JButton();
-            panelBoutton.add(tabBouttons[i]);
-            tabBouttons[i].setFont(new Font("SansSerif", Font.BOLD, 120));
-            tabBouttons[i].setFocusable(false);
-            tabBouttons[i].addActionListener(this);
+            buttonArray[i] = new JButton();
+            panelButton.add(buttonArray[i]);
+            buttonArray[i].setFont(new Font("SansSerif", Font.BOLD, 120));
+            buttonArray[i].setFocusable(false);
+            buttonArray[i].addActionListener(this);
         }
 
-        premierTour();
+        firstRound();
     }
 
-    public void premierTour() {
-        // try {
-        // Thread.sleep(2000);
-        // } catch (Exception e) {
-        // e.printStackTrace();
-        // }
+    public void firstRound() {
         if (new Random().nextInt(2) == 0) {
-            this.joueur1 = true;
-            titre.setText("joueur 1 : O");
+            this.player1Turn = true;
+            title.setText("joueur 1 : O");
         } else {
-            this.joueur1 = false;
-            titre.setText("joueur 2 : X");
+            this.player1Turn = false;
+            title.setText("joueur 2 : X");
         }
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         for (int i = 0; i < 9; i++) {
-            if (e.getSource() == tabBouttons[i]) {
-                if (joueur1) {
-                    if (tabBouttons[i].getText().equals("")) {
-                        tabBouttons[i].setForeground(new Color(162, 71, 71));
-                        tabBouttons[i].setText("O");
-                        joueur1 = false;
-                        titre.setText("joueur 2 : X");
+            if (e.getSource() == buttonArray[i]) {
+                if (player1Turn) {
+                    if (buttonArray[i].getText().equals("")) {
+                        buttonArray[i].setForeground(new Color(162, 71, 71));
+                        buttonArray[i].setText("O");
+                        player1Turn = false;
+                        title.setText("joueur 2 : X");
                         check();
                     }
                 } else {
-                    if (tabBouttons[i].getText().equals("")) {
-                        tabBouttons[i].setForeground(new Color(45, 91, 131));
-                        tabBouttons[i].setText("X");
-                        titre.setText("joueur 1 : O");
-                        joueur1 = true;
+                    if (buttonArray[i].getText().equals("")) {
+                        buttonArray[i].setForeground(new Color(45, 91, 131));
+                        buttonArray[i].setText("X");
+                        title.setText("joueur 1 : O");
+                        player1Turn = true;
                         check();
                     }
                 }
@@ -86,45 +79,45 @@ public class TicTacToe implements ActionListener {
     public void check() {
         // verticalement
         for (int i = 0; i < 2; i++) {
-            if (tabBouttons[i].getText().equals(tabBouttons[i + 3].getText())
-                    && tabBouttons[i].getText().equals(tabBouttons[i + 6].getText())
-                    && !tabBouttons[i].getText().equals("")) {
-                gagne(i, i + 3, i + 6);
+            if (buttonArray[i].getText().equals(buttonArray[i + 3].getText())
+                    && buttonArray[i].getText().equals(buttonArray[i + 6].getText())
+                    && !buttonArray[i].getText().equals("")) {
+                win(i, i + 3, i + 6);
             }
         }
 
         // horizontalement
         for (int i = 0; i <= 6; i += 3) {
-            if (tabBouttons[i].getText().equals(tabBouttons[i + 1].getText())
-                    && tabBouttons[i].getText().equals(tabBouttons[i + 2].getText())
-                    && !tabBouttons[i].getText().equals("")) {
-                gagne(i, i + 1, i + 2);
+            if (buttonArray[i].getText().equals(buttonArray[i + 1].getText())
+                    && buttonArray[i].getText().equals(buttonArray[i + 2].getText())
+                    && !buttonArray[i].getText().equals("")) {
+                win(i, i + 1, i + 2);
             }
         }
 
         // obliquement
-        if (tabBouttons[0].getText().equals(tabBouttons[4].getText())
-                && tabBouttons[0].getText().equals(tabBouttons[8].getText()) && !tabBouttons[0].getText().equals("")) {
-            gagne(0, 4, 8);
+        if (buttonArray[0].getText().equals(buttonArray[4].getText())
+                && buttonArray[0].getText().equals(buttonArray[8].getText()) && !buttonArray[0].getText().equals("")) {
+            win(0, 4, 8);
         }
-        if (tabBouttons[2].getText().equals(tabBouttons[4].getText())
-                && tabBouttons[2].getText().equals(tabBouttons[6].getText()) && !tabBouttons[2].getText().equals("")) {
-            gagne(2, 4, 6);
+        if (buttonArray[2].getText().equals(buttonArray[4].getText())
+                && buttonArray[2].getText().equals(buttonArray[6].getText()) && !buttonArray[2].getText().equals("")) {
+            win(2, 4, 6);
         }
     }
 
-    public void gagne(int x, int y, int z) {
-        tabBouttons[x].setBackground(new Color(125, 209, 121));
-        tabBouttons[y].setBackground(new Color(125, 209, 121));
-        tabBouttons[z].setBackground(new Color(125, 209, 121));
+    public void win(int x, int y, int z) {
+        buttonArray[x].setBackground(new Color(125, 209, 121));
+        buttonArray[y].setBackground(new Color(125, 209, 121));
+        buttonArray[z].setBackground(new Color(125, 209, 121));
 
-        if (tabBouttons[x].getText().equals("X")) {
-            titre.setText("X gagne");
+        if (buttonArray[x].getText().equals("X")) {
+            title.setText("X gagne");
         } else {
-            titre.setText("O gagne");
+            title.setText("O gagne");
         }
-        for (JButton boutton : tabBouttons) {
-            boutton.setEnabled(false);
+        for (JButton btn : buttonArray) {
+            btn.setEnabled(false);
         }
 
     }
