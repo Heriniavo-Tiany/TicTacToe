@@ -43,7 +43,7 @@ public class TicTacToe {
         titlePanel.setBackground(Color.BLACK);
         titleLabel = new JLabel();
         titleLabel.setText("Tic Tac Toe");
-        titleLabel.setForeground(Color.GREEN);
+        titleLabel.setForeground(Color.WHITE);
         titleLabel.setFont(new Font("Ink Free", Font.BOLD, 50));
         titlePanel.add(titleLabel);
         mainFrame.add(titlePanel, BorderLayout.NORTH);
@@ -67,6 +67,7 @@ public class TicTacToe {
                     if (buttons[index].getText().equals("")) {
                         buttons[index].setForeground(new Color(0, 128, 0));
                         buttons[index].setText(PLAYER_1_SYMBOL);
+                        titleLabel.setText(PLAYER_2_SYMBOL + " turn");
                         isPlayer1Turn = false;
                         if (checkForWin(PLAYER_1_SYMBOL)) {
                             JOptionPane.showMessageDialog(mainFrame,
@@ -86,6 +87,7 @@ public class TicTacToe {
                     if (buttons[index].getText().equals("")) {
                         buttons[index].setForeground(new Color(255, 0, 0));
                         buttons[index].setText(PLAYER_2_SYMBOL);
+                        titleLabel.setText(PLAYER_1_SYMBOL + " turn");
                         isPlayer1Turn = true;
                         if (checkForWin(PLAYER_2_SYMBOL)) {
                             JOptionPane.showMessageDialog(mainFrame,
@@ -165,6 +167,10 @@ public class TicTacToe {
             buttons[i].setText("");
         }
         isPlayer1Turn = new Random().nextBoolean();
+        if (isPlayer1Turn)
+            titleLabel.setText(PLAYER_1_SYMBOL + " turn");
+        else
+            titleLabel.setText(PLAYER_2_SYMBOL + " turn");
     }
 
 }
